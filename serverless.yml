@@ -1,0 +1,84 @@
+service: techpayrates
+
+provider:
+  name: aws
+  runtime: python3.7
+  environment:
+    GOOGLE_RECAPTCHA_TOKEN: ${ssm:GOOGLE_RECAPTCHA_TOKEN~true}
+    ALGOLIA_APPLICATION_ID: ${ssm:ALGOLIA_APPLICATION_ID~true}
+    ALGOLIA_SECRET_KEY: ${ssm:ALGOLIA_SECRET_KEY~true}
+    DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+
+functions:
+  postSalary:
+    handler: post.handler
+    events:
+      - http:
+          path: salary
+          integration: lambda
+          method: post
+          cors: true
+  get:
+    handler: get.handler
+    events:
+      - http:
+          path: salary
+          integration: lambda
+          method: get
+          cors: true
+
+resources:
+  Resources:
+    PennyForYourThoughtsTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain # Keeps around the DynamoDB resource when we redeploy/destroy
+      Properties:
+        AttributeDefinitions:
+        - AttributeName: title
+          AttributeType: S
+        - AttributeName: epochtimestamp
+          AttributeType: N
+        - AttributeName: salary
+          AttributeType: N
+        KeySchema:
+        - AttributeName: title
+          KeyType: HASH
+        - AttributeName: epochtimestamp
+          KeyType: RANGE
+        LocalSecondaryIndexes:
+        - IndexName: salaryindex
+          KeySchema:
+          - AttributeName: title
+            KeyType: HASH
+          - AttributeName: salary
+            KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
+
+package:
+  exclude:
+    - website/**
+    - venv/**
+
+plugins:
+  - serverless-finch
+  - serverless-python-requirements
+
+custom:
+  client:
+    bucketName: techpayrates.com
+  pythonRequirements:
+    dockerizePip: false

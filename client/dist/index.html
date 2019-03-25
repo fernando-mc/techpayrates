@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Tech Pay Rates</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/instantsearch.css@7.1.1/themes/algolia-min.css"
+    integrity="sha256-nkldBwBn2NQqRL1mod7BqHsJ6cEOn6u/ln6F/lI4CFo=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
+    integrity="sha256-9mbkOfVho3ZPXfM7W8sV2SndrGDuh7wuyLjtsWeTI1Q=" crossorigin="anonymous" />
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/algoliasearch@3.32.1/dist/algoliasearchLite.js"
+    integrity="sha256-pMaJf0I78weeXGkRMBDO6jSulxC/q3sb0aPdtV2N8n0=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@3.2.0"
+    integrity="sha256-/8usMtTwZ01jujD7KAZctG0UMk2S2NDNirGFVBbBZCM=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"
+    integrity="sha256-t8GepnyPmw9t+foMh3mKNvcorqNHamSKtKRxxpUEgFI=" crossorigin="anonymous"></script>
+
+  <style>
+    body {
+      background-color: #EDEDE8;
+    }
+
+    .main-box {
+      margin-top: 5rem;
+    }
+
+    body>.container {
+      padding: 24px;
+      background-color: #EDEDE8;
+    }
+
+    .hits-box {
+      padding: 1px 14px 12px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="ui top fixed stackable menu">
+    <div class="item">
+      <h2>Tech Pay Rates</h2>
+    </div>
+    <div class="right item">
+      <p>
+        A tool from <a href="https://blog.upfrontjobs.io">Upfront Jobs</a>. Sign up for our email list to <a
+          href="https://beta.upfrontjobs.io">learn more</a>.
+      </p>
+    </div>
+  </div>
+
+  <div class="ui container main-box">
+    <div class="ui grid">
+        <div class="row mobile only">
+            <br>
+            <br>
+        </div>
+    </div>
+    <div class="submit-box" id="form-div">
+      <div class="ui blue top attached segment">
+        <h3>Submit an annual pay rate:</h3>
+      </div>
+      <form class="ui equal width attached segment form" id="salary-submit">
+
+        <div class="three fields">
+          <div class="required field">
+            <label for="title">Job Title:</label>
+            <input type="text" class="form-control" id="title" placeholder="Software Engineer" name="title">
+          </div>
+          <div class="required field">
+            <label for="salary">Salary (USD):</label>
+            <input type="text" class="form-control" id="salary" placeholder="89000" name="salary">
+          </div>
+          <div class="field">
+            <label for="location">Location:</label>
+            <input type="text" class="form-control" id="location" placeholder="Seattle" name="location">
+          </div>
+        </div>
+
+        <div class="five fields">
+          <div class="field">
+            <label for="company">Company:</label>
+            <input type="text" class="form-control" id="company" placeholder="ABCD Inc." name="company">
+          </div>
+          <div class="field">
+            <label for="experience">Years Exp:</label>
+            <input type="text" class="form-control" id="experience" placeholder="3" name="experience">
+          </div>
+          <div class="field">
+            <label for="bonus">Bonus (USD):</label>
+            <input type="text" class="form-control" id="bonus" placeholder="15000" name="bonus">
+          </div>
+          <div class="field">
+            <label for="stock">Stock (USD):</label>
+            <input type="text" class="form-control" id="stock" placeholder="15000" name="stock">
+          </div>
+          <div class="field">
+            <label for="stock">Gender:</label>
+            <select class="ui selection dropdown" id="gender">
+              <option value="">Select gender</option>
+              <option value="Female">Female</option>
+              <option value="Male">Male</option>
+              <option value="Male to female">Male to female</option>
+              <option value="Female to male">Female to male</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="left item">
+          <div class="g-recaptcha" data-sitekey="6Left5cUAAAAAI5KM8AS0x9FnZtCkpvd5bCapzpm"></div>
+          <br>
+          <button type="submit" class="ui huge blue button">Submit</button>
+        </div>
+        <div class="ui error message">
+          <div id='error-message' style="color: red"></div>
+        </div>
+      </form>
+    </div>
+
+    <div class="ui horizontal divider" id="hr-divider">
+      Or
+    </div>
+
+    <div class="rates-box">
+      <div class="ui purple top attached segment">
+        <div class="ui stackable grid">
+          <div class="four wide column">
+            <h3>Search for pay rates:</h3>
+          </div>
+          <div class="twelve wide column" id="searchbox"></div>
+        </div>
+      </div>
+      <div class="ui attached segment">
+        <div id="hits"></div>
+        <br>
+        <img src="./search-by-algolia-light-background.png">
+      </div>
+
+    </div>
+  </div>
+
+  <br>
+
+</body>
+
+</html>
+
+<script>
+  const optionalFields = ['location', 'company', 'experience', 'bonus', 'stock', 'gender'];
+  var optionalInfo = ['Location: ', 'Company: ', 'Years Exp: ', 'Bonus: $', 'Stock: $', 'Gender: ']
+
+  const searchClient = algoliasearch('3E6EXIDIPK', 'dff6a3fabf1afdff07559f0f902e7f00');
+
+  const search = instantsearch({
+    indexName: 'techpayrates',
+    searchClient,
+  });
+
+  search.addWidget(
+    instantsearch.widgets.searchBox({
+      placeholder: "Search for salaries by title or location",
+      container: '#searchbox',
+      cssClasses: {
+        root: ['ui', 'fluid'],
+        form: ['ui', 'fluid'],
+      },
+    })
+  );
+
+  search.addWidget(
+    instantsearch.widgets.hits({
+      container: '#hits',
+      empty: 'No results for <q>{{ query }}</q> were found.',
+      cssClasses: {
+        root: ['hits-box'],
+        list: ['ui', 'cards', 'three', 'stackable'],
+        item: ['ui', 'card'],
+      },
+      templates: {
+        item(hit) {
+          var data = `
+            <div class="content">
+              <div class="header">${instantsearch.highlight({ attribute: 'title', highlightedTagName: 'mark', hit })}</div>
+              <div class="meta">${ hit.date }</div>              
+              <div class="event">
+                <div class="content">
+                  <div class="summary">
+                    Salary: $${ hit.salary }
+                  </div>
+                </div>
+              </div>
+          `;
+
+          var optionalData = ''
+          for (i = 0; i < optionalFields.length; i++) {
+            if (hit[optionalFields[i]]) {
+              optionalData += `
+                <div class="event">
+                  <div class="content">
+                    <div class="summary">
+                      ${optionalInfo[i]}${ hit[optionalFields[i]] }
+                    </div>
+                  </div>
+                </div>
+              `;
+            }
+          }
+
+          var result = data + optionalData;
+
+          result += '</div>';
+
+          return result;
+        }
+      }
+    })
+  );
+
+  search.start();
+
+
+  var API_URL = 'https://gvqrglxw55.execute-api.us-east-1.amazonaws.com/dev/salary';
+
+  var errorDiv = document.getElementById('error-message')
+
+  $('#salary-submit').submit(function (event) {
+    event.preventDefault();
+
+    const captchtaResponse = grecaptcha.getResponse() || false
+
+    if (!captchtaResponse) {
+      errorDiv.innerHTML = 'Complete the Captcha please!'
+      return false
+    }
+
+    if (!$('#title').val() || !$('#salary').val()) {
+      errorDiv.innerHTML = 'Please make sure to have a title and salary!'
+      return false
+    }
+
+    var post_data = {
+      title: $('#title').val(),
+      salary: $('#salary').val(),
+      captcha: captchtaResponse
+    };
+
+    for (i = 0; i < optionalFields.length; i++) {
+      if ($('#' + optionalFields[i]).val()) {
+        post_data[optionalFields[i]] = $('#' + optionalFields[i]).val()
+      }
+    }
+
+    $.ajax({
+      type: 'POST',
+      url: API_URL,
+      dataType: 'json',
+      crossDomain: true,
+      contentType: 'application/json',
+      data: JSON.stringify(post_data),
+      success: function (responseData, textStatus, jqXHR) {
+        console.log(responseData);
+        if (responseData.statusCode == '200') {
+          document.getElementById("form-div").innerHTML = "<p> Your salary was submitted!</p>"
+          document.getElementById("hr-divider").innerHTML = ""
+        };
+        if (responseData.message == 'Captcha Invalid') {
+          console.log('The Captcha failed. Please try again!')
+        };
+      },
+    })
+  })
+</script>

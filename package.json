@@ -1,0 +1,24 @@
+{
+  "name": "techpayrates.com",
+  "version": "1.0.0",
+  "description": "## SCOPE",
+  "main": "index.js",
+  "dependencies": {
+    "serverless-finch": "^2.3.2",
+    "serverless-python-requirements": "^4.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fernando-mc/techpayrates.com.git"
+  },
+  "author": "Fernando Medina Corey",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/fernando-mc/techpayrates.com/issues"
+  },
+  "homepage": "https://github.com/fernando-mc/techpayrates.com#readme"
+}
