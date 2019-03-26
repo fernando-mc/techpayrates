@@ -62,7 +62,7 @@ def handler(event, context):
         'title': event_body['title'],
         'epochtimestamp': int(time.time() * 1000),
         'date': time.strftime('%b %d, %Y'),
-        'salary': int(event_body['salary']),
+        'salary': int(event_body['salary'].replace(',', '')),
         'submissionid': str(uuid.uuid4())
     }
     optional_fields = ['location', 'company', 'experience', 'bonus', 'stock', 'gender']
