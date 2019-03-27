@@ -157,6 +157,9 @@
   const search = instantsearch({
     indexName: 'techpayrates',
     searchClient,
+    searchParameters: {
+      hitsPerPage: 21,
+    }
   });
 
   search.addWidget(
