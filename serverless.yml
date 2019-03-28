@@ -27,14 +27,6 @@ functions:
           integration: lambda
           method: post
           cors: true
-  get:
-    handler: get.handler
-    events:
-      - http:
-          path: salary
-          integration: lambda
-          method: get
-          cors: true
 
 resources:
   Resources:
