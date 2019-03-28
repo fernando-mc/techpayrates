@@ -30,7 +30,7 @@ functions:
 
 resources:
   Resources:
-    PennyForYourThoughtsTable:
+    TechSalaries:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain # Keeps around the DynamoDB resource when we redeploy/destroy
       Properties:
